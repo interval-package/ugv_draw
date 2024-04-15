@@ -1,8 +1,11 @@
 *.png
 *.mp4
 *.pdf
+
 __pycache__
 
+*.npy
+*.pkl
 *.zip
 
 *.csv

@@ -5,7 +5,8 @@ from utils.obst_config import obst_cir_red, obst_cir_gray, \
     obst_rect_cargo0, obst_rect_cargo1, obst_rect_cargo2, obst_rect_cargo3, obst_rect_cargo4,\
     obst_rect_shelf
 
-sns.set_style("whitegrid")
+# sns.set_style("whitegrid")
+sns.set_style("darkgrid")
 
 world_bound_x = [-2, 5]
 world_bound_y = [-6, 4]
