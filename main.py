@@ -70,7 +70,6 @@ def main_draw_action():
     plt.savefig("./figure/actions/ugv_exp_action.pdf")
     return
 
-
 def main_calc_metric():
     from ugv_draw.calc_metric import calc_metric
     figure = plt.figure(figsize=(32,8))

@@ -1,13 +1,20 @@
 import cv2
 import os
+import tqdm
 
-path_res = "/home/zhengziang/zaspace/projects/ugv_draw/video/res"
+path_res = "/home/zhengziang/code/ugv_draw/video/res"
 
-path_base = "/home/zhengziang/zaspace/projects/ugv_draw/video"
+path_base = "/home/zhengziang/code/ugv_draw/video"
+
+path_figure = "/home/zhengziang/code/ugv_draw/figure"
 
 path_video = os.path.join(path_base, "ugv.mp4")
 
 path_video_ai = os.path.join(path_base, "ai_gen.mp4")
+
+path_video_outside = os.path.join(path_base, "ugv_outside.mp4")
+
+path_frame_saved = os.path.join(path_figure, "frames_outside")
 
 def extract_frame(video_path, frame_number, output_path, frame_rate=20):
     # Open the video file
@@ -77,7 +84,7 @@ def delete_frames(input_video_path, frames_to_remove = [10, 20, 30], out_put_vid
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # Open an output video file
-    output_video_path = os.path.join(path_res, 'output_video.mp4')
+    output_video_path = os.path.join(path_res, out_put_video_path)
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(output_video_path, fourcc, fps, (frame_width, frame_height))
 
@@ -106,13 +113,21 @@ def delete_frames(input_video_path, frames_to_remove = [10, 20, 30], out_put_vid
     print("Video processing complete. Output saved to", output_video_path)
     return
 
-path_frame_saved = "/home/zhengziang/zaspace/projects/ugv_draw/figure/frames_2"
-
-def extract_frames(input_video_path, frames_to_save = [10, 20, 30]):
+def extract_frames(input_video_path, frames_to_save = [10, 20, 30], output_path=path_frame_saved):
     cap = cv2.VideoCapture(input_video_path)
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+        print(f"Making dirs in {output_path}")
+
+    # breakpoint()
+
+    assert cap.isOpened(), "Video not read."
+
+    pbar = tqdm.tqdm(frames_to_save)
 
     # Read and write each frame
     frame_index = 0
+
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
@@ -121,7 +136,8 @@ def extract_frames(input_video_path, frames_to_save = [10, 20, 30]):
         
         # Skip frames to be removed
         if frame_index in frames_to_save:
-            cv2.imwrite(os.path.join(path_frame_saved, f"frame_{frame_index}.png"), frame)
+            pbar.update(1)
+            cv2.imwrite(os.path.join(output_path, f"frame_{frame_index}.png"), frame)
             
         frame_index += 1
 
@@ -166,6 +182,8 @@ def replace_frames(input_video_path, replace_video_path, output_video_path, star
 
 if __name__ == "__main__":
 
+    # 室内实验 
+
     # frames = list(range(210, 220, 1)) + list(range(230, 240, 1))
     # frames = list(range(180, 220, 2)) + [221, 222, 224, 225, 226, 227] +  list(range(230, 240, 1))
     # frame_to_repeat = [239]
@@ -175,6 +193,18 @@ if __name__ == "__main__":
 
     # extract_frames(path_video, frames)
 
-    replace_frames(path_video, path_video_ai, os.path.join(path_res, "rep_ai.mp4"))
+    # replace_frames(path_video, path_video_ai, os.path.join(path_res, "rep_ai.mp4"))
+
+    # 处理室外实验的内容
+
+    frames = list(range(150, 1500, 50))
+
+    # delete_frames(path_video_outside, frames_to_remove=frames, out_put_video_path="cut_outside.mp4")
+
+    # /home/zhengziang/code/ugv_draw/video/ugv_outside.mp4
+    print(path_video_outside)
+
+    extract_frames(path_video_outside, frames, path_frame_saved)
+
 
     pass
