@@ -4,7 +4,11 @@ import numpy as np
 from typing import List, Literal, Union
 import os
 
-path_base_res = "data/results_2403"
+path_indoor = "data/indoor/results_2403"
+
+path_outside = "data/outside/results"
+
+path_base_res = path_outside
 
 path_results = [name for name in os.listdir(path_base_res) if name.endswith("ADP")]
 
@@ -16,8 +20,9 @@ headers_csv = ["action_delta_v_normal","action_w","action_v",
 def preload_tab(tar_file:Union[int, str]):
     if isinstance(tar_file, int):
         tar_file = path_results[tar_file]
-    
-    tab = pd.read_csv(os.path.join(path_base_res, tar_file, "results0.csv"))
+    data_file = os.path.join(path_base_res, tar_file, "results0.csv")
+    assert os.path.exists(data_file), "No such data"
+    tab = pd.read_csv(data_file)
     return tab
 
 def process_scene_traj(tab: pd.DataFrame):

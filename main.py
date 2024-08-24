@@ -1,17 +1,18 @@
 from ugv_draw.draw_scene import draw_scene, draw_traj, draw_road, draw_sub_legend
 from ugv_draw.ugv_patch import UGV_patch
 from utils.dataloader import preload_tab, process_scene_traj
+import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
 import matplotlib.image as mpimg
 
-plt.rcParams["font.family"] = "Arial"
+# plt.rcParams["font.family"] = "Arial"
 # font size
-plt.rcParams["font.size"] = 36
+# plt.rcParams["font.size"] = 36
 # math stix
-plt.rcParams["mathtext.fontset"] = "stix"
+# plt.rcParams["mathtext.fontset"] = "stix"
 
 def main_draw_scene():
     data = preload_tab(0)
@@ -50,24 +51,33 @@ def main_draw_scene():
     # plt.savefig("./temp.pdf")
     return ax
 
-def main_draw_action():
+def main_draw_action(data_idx=0, sub_dir=None):
+    dir_res = os.path.join("./figure", "actions")
+    if sub_dir is not None:
+        dir_res = os.path.join(dir_res, sub_dir)
+    if not os.path.exists(dir_res):
+        os.makedirs(dir_res)
+    
     figure = plt.figure(figsize=(16,4))
-
     from ugv_draw.draw_state import draw_action, draw_mpc, draw_state, draw_combined
 
-    data = preload_tab(0)
+    try:
+        data = preload_tab(data_idx)
     # data = process_scene_traj(data)
+    except AssertionError as e:
+        print(repr(e))
+        return
 
     ax_acc = figure.add_subplot(1, 2, 1)
     ax_w = figure.add_subplot(1, 2, 2)
 
-    draw_combined(data, ax_acc, ax_w, replace_num=100, scale_factor=8/2.45)
+    draw_combined(data, ax_acc, ax_w, replace_num=100, scale_factor=7.4/2.45)
 
     # draw_action(data, ax_acc, ax_w)
     # draw_mpc(ax_acc, ax_w, scale_factor=8/3)
     plt.tight_layout()
-    plt.savefig("./figure/actions/ugv_exp_action.png", dpi=200)
-    plt.savefig("./figure/actions/ugv_exp_action.pdf")
+    plt.savefig(os.path.join(dir_res, f"ugv_exp_action_{data_idx}.png"), dpi=200)
+    # plt.savefig(os.path.join(dir_res, f"ugv_exp_action_{data_idx}.pdf"))
     return
 
 def main_calc_metric():
@@ -80,7 +90,9 @@ def main_calc_metric():
 
 if __name__ == "__main__":
     # main_draw_scene()
-    # main_draw_action()
-    main_calc_metric()
+    tars = [2]
+    for tar in tars:
+        main_draw_action(tar, sub_dir="outside")
+    # main_calc_metric()
 
     pass
